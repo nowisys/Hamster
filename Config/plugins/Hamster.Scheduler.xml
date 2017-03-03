@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<plugin xmlns="http://www.nowisys.de/hamster/schemas/plugin.xsd">
+  <name>Hamster.Scheduler</name>
+  <type>Hamster.Service.Scheduler.SchedulerPlugin, Hamster.Service.Scheduler</type>
+  <settings xmlns="http://www.nowisys.de/hamster/plugins/services/scheduler.xsd">
+    <crontab>config/scheduler/schedules.crontab</crontab>
+    <events>config/scheduler/events.xml</events>
+    <commands>config/scheduler/commands/</commands>
+  </settings>
+</plugin>

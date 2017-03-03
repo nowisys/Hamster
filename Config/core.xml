@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <facilities>
+    <facility id="logging"
+              type="Castle.Facilities.Logging.LoggingFacility, Castle.Facilities.Logging"
+              loggingApi="log4net"
+              configFile="Config/logging.xml"/>
+    <facility id="xmlConfigure"
+              type="Hamster.XmlConfigurableFacility, Hamster"/>
+    <facility id="binding"
+              type="Hamster.BindingFacility, Hamster"/>
+    <facility id="pluginStart"
+              type="Hamster.PluginStartFacility, Hamster"/>
+    <facility id="startable"
+              type="Castle.Facilities.Startable.StartableFacility, Castle.MicroKernel"/>
+  </facilities>
+  
+  <components>
+    <component id="PluginDirectory"
+               service="Hamster.Plugin.IPluginDirectory, Hamster.Plugin"
+               type="Hamster.PluginDirectory, Hamster">
+    </component>
+
+    <component id="PluginManager"
+               service="Hamster.Plugin.Configuration.IPluginManager, Hamster.Plugin"
+               type="Hamster.Plugin.Configuration.FilePluginManager, Hamster.Plugin">
+      <parameters>
+        <directory>Config/plugins/</directory>
+      </parameters>
+    </component>
+
+    <component id="PluginLoader"
+               type="Hamster.PluginLoader, Hamster">
+      <parameters>
+        <manager>${PluginManager}</manager>
+        <StartupPlugins>
+          <array>
+            <item>PluginManager</item>
+          </array>
+        </StartupPlugins>
+      </parameters>
+    </component>
+
+    <component id="Signals.MainQueue"
+               service="Hamster.Plugin.Signal.ISignalQueue, Hamster.Plugin"
+               type="Hamster.Plugin.Signal.FifoSignalQueue, Hamster.Plugin">
+    </component>
+
+    <!--<component id="Factory.Objects"
+               service="Hamster.Plugin.IObjectFactory, Hamster.Plugin"
+               type="Hamster.CastleObjectFactory, Hamster">
+    </component>-->
+
+    <component id="Processor.Main"
+               type="Hamster.Plugin.Signal.SignalProcessor, Hamster.Plugin">
+      <parameters>
+        <queue>${Signals.MainQueue}</queue>
+      </parameters>
+    </component>
+
+    <component id="ProcessManager"
+               type="Hamster.ProcessManager, Hamster">
+      <parameters>
+        <processors>
+          <array>
+            <item>${Processor.Main}</item>
+          </array>
+        </processors>
+      </parameters>
+    </component>
+
+    <component id="LoggerManager"
+               service="Hamster.Plugin.ILoggerManager, Hamster.Plugin"
+               type="Hamster.Log.Log4NetLoggerManager, Hamster">
+      
+    </component>
+  </components>
+</configuration>

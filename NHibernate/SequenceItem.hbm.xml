@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="Hamster.Plugin"
+                   namespace="Hamster.Plugin.Sequence">
+
+  <class name="SequenceItem" table="sequence" lazy="false">
+    <id name="SequenceId" column="sequenceId">
+      <generator class="assigned"/>
+    </id>
+    <property name="Value" column="sequenceValue"/>
+    <property name="Rule" column="sequenceRule"/>
+    <property name="LastChange" column="lastChange" type="Hamster.Plugin.NHibernate.UtcDateTime, Hamster.Plugin"/>
+  </class>
+
+</hibernate-mapping>

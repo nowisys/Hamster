@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="Hamster.Plugin"
+                   namespace="Hamster.Plugin.Data">
+
+  <class name="DataStoreItem" table="dataStore" lazy="false">
+    <id name="DataId" column="dataId">
+      <!--<generator class="Hamster.Plugin.NHibernate.SequenceGenerator, Hamster.Plugin">
+        <param name="sequenceId">dataStoreIds</param>
+      </generator>-->
+      <generator class="identity"/>
+    </id>
+    <property name="HandlerName" column="handlerName"/>
+    <property name="CreationTime" column="creationTime" type="Hamster.Plugin.NHibernate.UtcDateTime, Hamster.Plugin"/>
+    <property name="Error" column="error"/>
+    <property name="ProcessTime" column="processTime" type="Hamster.Plugin.NHibernate.UtcDateTime, Hamster.Plugin"/>
+    <property name="Data" column="data" type="Hamster.Plugin.NHibernate.XmlType, Hamster.Plugin"/>
+    <property name="DataType" column="dataType"/>
+  </class>
+
+</hibernate-mapping>

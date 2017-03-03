@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="Hamster.Plugin"
+                   namespace="Hamster.Plugin.Configuration">
+
+  <class name="PluginConfiguration" table="plugin" lazy="false">
+    
+    <id name="PluginName" column="pluginName">
+      <generator class="assigned"/>
+    </id>
+
+    <property name="AssemblyName" column="assemblyName"/>
+    <property name="TypeName" column="typeName"/>
+    <property name="Settings" column="settings" type="Hamster.Plugin.NHibernate.XmlType, Hamster.Plugin"/>
+    
+  </class>
+  
+</hibernate-mapping>

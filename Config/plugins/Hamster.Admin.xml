@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<plugin xmlns="http://www.nowisys.de/hamster/schemas/plugin.xsd">
+  <name>Hamster.Admin</name>
+  <type>Hamster.Admin.WebService.WebAdminPlugin, Hamster.Admin.WebService</type>
+  <settings xmlns="http://www.nowisys.de/hamster/plugins/admin/web.xsd">
+    <resources>D:\projects\hamster\Admin\Web\</resources>
+    <host debug="false">
+      <url>http://localhost:8080/hamster/admin/</url>
+    </host>
+    <security proxyAuth="YXBhY2hlOmQzYmJmODk0NjZmODRlNTA4NzY1YTI2ZTQwNTM0MDVk">
+      <!-- Authorize: Basic apache:d3bbf89466f84e508765a26e4053405d -->
+      <access from="localhost" user="proxy" group="proxy" type="allow" />
+    </security>
+  </settings>
+</plugin>
