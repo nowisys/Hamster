@@ -1,0 +1,17 @@
+<hamster>
+    <!--
+         The following directory structure is assumed:
+
+            └── my-root
+                ├── etc
+                │   └── hamster.xml
+                └── lib
+                    └── hamster
+                        ├── Hamster.Plugin1.dll
+                        ├── Hamster.Plugin2.dll
+                        └── ...
+    -->
+    <!-- Try paths relative to the configuration file. -->
+    <load path="../lib/hamster" pattern="*.dll" recursive="true"/>
+    <load path="../usr/lib/hamster" pattern="*.dll" recursive="true"/>
+</hamster>
