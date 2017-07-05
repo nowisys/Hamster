@@ -7,6 +7,6 @@
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Hamster.Plugin\src\Hamster.Plugin\Hamster.Project.csproj" />
+    <ProjectReference Include="..\..\..\Hamster.Plugin\src\Hamster.Plugin\Hamster.Plugin.csproj" />
   </ItemGroup>
 </Project>
