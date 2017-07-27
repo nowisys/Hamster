@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -124,7 +124,7 @@ namespace Hamster
 
             var configDir = Path.GetDirectoryName(configPath);
             logger.Info($"Load configuration from: {configPath}");
-            var config = LoadConfig(args[0]);
+            var config = LoadConfig(configPath);
 
             if (config.Plugins == null || config.Plugins.Length == 0) {
                 logger.Fatal("No plugins configured");
