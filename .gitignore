@@ -1,4 +1,9 @@
 
+# Hamster Build
+obj/
+bin/
+build/
+
 # Created by https://www.gitignore.io/api/visualstudio,monodevelop,visualstudiocode
 
 ### MonoDevelop ###

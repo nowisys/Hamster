@@ -42,14 +42,12 @@ namespace Hamster
                 try
                 {
                     var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(fullPath);
-                    Console.WriteLine(assembly.ToString());
                     foreach (var type in assembly.DefinedTypes) {
                         if (pluginType.IsAssignableFrom(type) && !type.IsAbstract && !type.IsInterface) {
-                            Console.WriteLine(type);
                             var t = Type.GetType(type.AssemblyQualifiedName);
-                            Console.WriteLine(t);
                         }
                     }
+                    logger.Info($"Loaded assembly: {fullPath}");
                 }
                 catch (ReflectionTypeLoadException ex)
                 {
