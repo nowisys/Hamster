@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -32,7 +32,6 @@ namespace Hamster
                 logger.Info($"Skip assemblies from {path}");
                 return;
             }
-
             logger.Info($"Load assemblies from {path}");
             var pluginType = typeof(IPlugin).GetTypeInfo();
             var option = recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
@@ -52,9 +51,16 @@ namespace Hamster
                         }
                     }
                 }
+                catch (ReflectionTypeLoadException ex)
+                {
+                    foreach (Exception inner in ex.LoaderExceptions)
+                    {
+                        logger.Warn(inner, $"Error loading assembly from: {fullPath}");
+                    }
+                }
                 catch (Exception x)
                 {
-                    logger.Warn(x, $"Error loading assemby from: {fullPath}");
+                    logger.Warn(x, $"Error loading assembly from: {fullPath}");
                 }
             }
         }

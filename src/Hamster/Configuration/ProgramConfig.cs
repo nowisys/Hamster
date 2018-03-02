@@ -13,7 +13,7 @@ namespace Hamster.Configuration
         [XmlElement("load")]
         public FilePatternConfig[] Assemblies { get; set; }
 
-        [XmlElement("plugin")]
+        [XmlElement("plugin", Namespace = "http://www.nowisys.de/hamster/schemas/plugin.xsd")]
         public PluginConfig[] Plugins { get; set; }
     }
 }
