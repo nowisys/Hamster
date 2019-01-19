@@ -18,20 +18,33 @@ namespace Hamster
 
         public static ProgramConfig LoadConfig(string path)
         {
-            var serializer = new XmlSerializer(typeof(ProgramConfig));
-
-            using (var file = File.Open(path, FileMode.Open))
-            {
-                return (ProgramConfig)serializer.Deserialize(file);
+            if (path == null) {
+                logger.Info($"Load default configuration");
+                return new ProgramConfig() {
+                    Assemblies = new FilePatternConfig[] { new FilePatternConfig() { Path = "lib/hamster/plugins", Pattern="*.dll", Recursive=true } },
+                    Plugins = new FilePatternConfig[] {
+                        new FilePatternConfig() { Path = "/etc/hamster", Pattern="*.xml", Recursive=true },
+                        new FilePatternConfig() { Path = "etc/hamster", Pattern="*.xml", Recursive=true },
+                    },
+                };
+            } else {
+                logger.Info($"Load configuration from: {path}");
+                var serializer = new XmlSerializer(typeof(ProgramConfig));
+                using (var file = File.Open(path, FileMode.Open))
+                {
+                    return (ProgramConfig)serializer.Deserialize(file);
+                }
             }
         }
 
         public static void LoadAssemblies(string path, string pattern, bool recurse)
         {
+            path = Path.GetFullPath(path);
             if (!Directory.Exists(path)) {
                 logger.Info($"Skip assemblies from {path}");
                 return;
             }
+
             logger.Info($"Load assemblies from {path}");
             var pluginType = typeof(IPlugin).GetTypeInfo();
             var option = recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
@@ -70,6 +83,41 @@ namespace Hamster
             services.AddSingleton<IObjectFactory>(new ObjectFactory(services));
             // TODO: Add more kernel services
             return services;
+        }
+
+        public static void LoadPlugins(List<PluginConfig> plugins, string path, string pattern, bool recurse)
+        {
+            path = Path.GetFullPath(path);
+            if (!Directory.Exists(path)) {
+                logger.Info($"Skip plugins from {path}");
+                return;
+            }
+
+            var serializer = new XmlSerializer(typeof(PluginConfig));
+
+            logger.Info($"Load plugins from {path}");
+            var option = recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+            foreach (var filePath in Directory.EnumerateFiles(path, pattern, option))
+            {
+                var fullPath = Path.GetFullPath(filePath);
+                try {
+                    using (var file = File.Open(fullPath, FileMode.Open)) {
+                        plugins.Add((PluginConfig)serializer.Deserialize(file));
+                    }
+                    logger.Info($"Loaded plugin config: {fullPath}");
+                } catch (Exception x) {
+                    logger.Warn(x, $"Error loading pluginc config from: {fullPath}");
+                }
+            }
+        }
+
+        public static List<PluginConfig> LoadAllPlugins(IEnumerable<FilePatternConfig> configs)
+        {
+            var plugins = new List<PluginConfig>();
+            foreach (var pattern in configs) {
+                LoadPlugins(plugins, pattern.Path, pattern.Pattern, pattern.Recursive);
+            }
+            return plugins;
         }
 
         public static Dictionary<string, IPlugin> CreatePlugins(IEnumerable<PluginConfig> config)
@@ -113,23 +161,39 @@ namespace Hamster
             }
         }
 
+        private static string Locate(string path)
+        {
+            string prefix = Path.GetFullPath(".");
+            while (prefix != null) {
+                var result = Path.Combine(prefix, path);
+                if (File.Exists(result)) {
+                    return result;
+                }
+                prefix = Path.GetDirectoryName(prefix);
+            }
+            return null;
+        }
+
         public static void Main(string[] args)
         {
+            var entry = Path.GetFullPath(Environment.GetCommandLineArgs()[0]);
+            var prefix = Path.Combine(Path.GetDirectoryName(entry), "../..");
+            Directory.SetCurrentDirectory(prefix);
+
             logger = new DebugLogger("Hamster");
-            var configPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]), "../etc/hamster.xml"));
-            if (args.Length >= 1) {
-                configPath = Path.GetFullPath(args[0]);
+
+            if (args.Length > 1) {
+                logger.Fatal("Invalid command line arguments.");
+                return;
             }
 
-            if (!File.Exists(configPath)) {
+            string configPath = args.Length == 1 ? Path.GetFullPath(args[0]) : Locate("etc/hamster.xml");
+            if (configPath != null && !File.Exists(configPath)) {
                 logger.Fatal($"Configuration file not found: {configPath}");
                 return;
             }
 
-            var configDir = Path.GetDirectoryName(configPath);
-            logger.Info($"Load configuration from: {configPath}");
             var config = LoadConfig(configPath);
-
             if (config.Plugins == null || config.Plugins.Length == 0) {
                 logger.Fatal("No plugins configured");
                 return;
@@ -142,14 +206,13 @@ namespace Hamster
             }
 
             try {
-                Directory.SetCurrentDirectory(configDir);
-
                 foreach (var include in config.Assemblies) {
                     LoadAssemblies(include.Path, include.Pattern, include.Recursive);
                 }
 
-                var plugins = CreatePlugins(config.Plugins);
-                ConfigurePlugins(plugins, config.Plugins);
+                var pluginConfigs = LoadAllPlugins(config.Plugins);
+                var plugins = CreatePlugins(pluginConfigs);
+                ConfigurePlugins(plugins, pluginConfigs);
 
                 foreach (var plugin in plugins.Values) {
                     plugin.Open();

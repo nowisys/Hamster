@@ -3,6 +3,7 @@
 obj/
 bin/
 build/
+dist/
 
 # Created by https://www.gitignore.io/api/visualstudio,monodevelop,visualstudiocode
 
