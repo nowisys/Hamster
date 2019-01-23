@@ -14,37 +14,12 @@ namespace Hamster.Plugin.Events
     /// </remarks>
     public class AsyncEventTrigger : SimpleEventTrigger
     {
-        /// <summary>
-        /// Erstellt eine neue Instanz von AsyncEventTrigger.
-        /// </summary>
-        public AsyncEventTrigger()
+        public override void Invoke<TSender, TArgs>(EventHandler<TSender, TArgs> handler, TSender sender, TArgs args)
         {
-        }
-
-        /// <summary>
-        /// Führt eine Funktion im Kontext des Triggers aus.
-        /// </summary>
-        /// <param name="functor">IEventFunctor der ausgeführt werden soll.</param>
-        protected override void InternalInvoke(IEventFunctor functor)
-        {
-            ThreadPool.QueueUserWorkItem(InvokeCallback, functor);
-        }
-
-        /// <summary>
-        /// Callback der innerhalb des Threadpools ausfegührt wird.
-        /// </summary>
-        /// <param name="state">Enthält den IEventFunctor der ausgeführt werden soll.</param>
-        protected virtual void InvokeCallback(object state)
-        {
-            IEventFunctor functor = (IEventFunctor)state;
-
-            try
-            {
-                functor.Invoke();
-            }
-            catch (Exception x)
-            {
-                Logger.Error("Error while invoking event handler.", x);
+            try {
+                ThreadPool.QueueUserWorkItem((s) => base.Invoke(handler, sender, args));
+            } catch (Exception x) {
+                Logger?.Error(x, "Error while queuing event {0}({1}, {2})", handler, sender, args);
             }
         }
     }

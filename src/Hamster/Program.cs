@@ -6,6 +6,7 @@ using System.Runtime.Loader;
 using System.Xml.Serialization;
 
 using Hamster.Plugin;
+using Hamster.Plugin.Events;
 using Hamster.Plugin.Debug;
 using Hamster.Configuration;
 using Hamster.Plugin.Configuration;
@@ -15,6 +16,7 @@ namespace Hamster
     public class Program
     {
         private static ILogger logger;
+        private static QueuingEventTrigger eventQueue;
 
         public static ProgramConfig LoadConfig(string path)
         {
@@ -81,6 +83,7 @@ namespace Hamster
             var services = new KernelServices();
             services.AddSingleton<ILogger>(logger.CreateChildLogger(name));
             services.AddSingleton<IObjectFactory>(new ObjectFactory(services));
+            services.AddSingleton<IEventTrigger>(eventQueue);
             // TODO: Add more kernel services
             return services;
         }
@@ -181,6 +184,7 @@ namespace Hamster
             Directory.SetCurrentDirectory(prefix);
 
             logger = new DebugLogger("Hamster");
+            eventQueue = new QueuingEventTrigger();
 
             if (args.Length > 1) {
                 logger.Fatal("Invalid command line arguments.");
@@ -218,7 +222,7 @@ namespace Hamster
                     plugin.Open();
                 }
 
-                Console.ReadKey();
+                eventQueue.RunForever();
             } catch (Exception e) {
                 logger.Fatal(e, "Unhandled exception.");
             }

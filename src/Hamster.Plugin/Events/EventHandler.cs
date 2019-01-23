@@ -9,6 +9,5 @@ namespace Hamster.Plugin.Events
     /// <typeparam name="TArgs">Klasse der Daten des Events.</typeparam>
     /// <param name="sender">Auslöser des Events.</param>
     /// <param name="args">Daten des Events.</param>
-    public delegate void EventHandler<TSender, TArgs>(TSender sender, TArgs args)
-    where TArgs : EventArgs;
+    public delegate void EventHandler<TSender, TArgs>(TSender sender, TArgs args);
 }

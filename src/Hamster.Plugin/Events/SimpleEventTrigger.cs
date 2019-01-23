@@ -4,46 +4,10 @@ namespace Hamster.Plugin.Events
 {
     public class SimpleEventTrigger : IEventTrigger
     {
-        private ILogger logger = NullLogger.Instance;
-
         /// <summary>
-        /// Zeigt und setzt den Logger für diese Instanz.
+        /// Logger for errors in the invokation of events.
         /// </summary>
-        public ILogger Logger
-        {
-            get { return logger; }
-            set { logger = value ?? NullLogger.Instance; }
-        }
-
-        /// <summary>
-        /// Führt eine Funktion im Kontext des Triggers aus.
-        /// </summary>
-        /// <param name="functor">IEventFunctor der ausgeführt werden soll.</param>
-        protected virtual void InternalInvoke(IEventFunctor functor)
-        {
-            functor.Invoke();
-        }
-
-        /// <summary>
-        /// Führt eine Funktion im Kontext des Triggers aus.
-        /// </summary>
-        /// <param name="functor">IEventFunctor der ausgeführt werden soll.</param>
-        public virtual void Invoke(IEventFunctor functor)
-        {
-            if (functor == null)
-            {
-                throw new ArgumentNullException("functor");
-            }
-
-            try
-            {
-                InternalInvoke(functor);
-            }
-            catch (Exception x)
-            {
-                logger.Error(x, "Error while invoking functor {0}.", functor);
-            }
-        }
+        public ILogger Logger { get; set; }
 
         /// <summary>
         /// Führt einen EventHandler im Kontext des Triggers aus.
@@ -54,13 +18,11 @@ namespace Hamster.Plugin.Events
         /// <param name="sender">Sender des Events.</param>
         /// <param name="args">Informationen über das Event.</param>
         public virtual void Invoke<TSender, TArgs>(EventHandler<TSender, TArgs> handler, TSender sender, TArgs args)
-            where TArgs : EventArgs
         {
-            if (handler != null)
-            {
-                EventFunctor<TSender, TArgs> functor = new EventFunctor<TSender, TArgs>(handler, sender, args);
-
-                Invoke(functor);
+            try {
+                handler?.Invoke(sender, args);
+            } catch (Exception x) {
+                Logger?.Error(x, "Error while invoking event {0}({1}, {2})", handler, sender, args);
             }
         }
     }

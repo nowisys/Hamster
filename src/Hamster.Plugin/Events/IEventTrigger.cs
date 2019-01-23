@@ -2,8 +2,6 @@ using System;
 
 namespace Hamster.Plugin.Events
 {
-    public delegate void Action();
-
     /// <summary>
     /// Interface zum Auslösen von Events im Kontext eines Triggers.
     /// </summary>
@@ -19,12 +17,6 @@ namespace Hamster.Plugin.Events
     public interface IEventTrigger
     {
         /// <summary>
-        /// Führt eine Funktion im Kontext des Triggers aus.
-        /// </summary>
-        /// <param name="functor">IEventFunctor der ausgeführt werden soll.</param>
-        void Invoke(IEventFunctor functor);
-
-        /// <summary>
         /// Führt einen EventHandler im Kontext des Triggers aus.
         /// </summary>
         /// <typeparam name="TSender">Klasse des Senders des Events.</typeparam>
@@ -32,7 +24,6 @@ namespace Hamster.Plugin.Events
         /// <param name="handler">EventHandler der ausgelöst werden soll.</param>
         /// <param name="sender">Sender des Events.</param>
         /// <param name="args">Informationen über das Event.</param>
-        void Invoke<TSender, TArgs>(EventHandler<TSender, TArgs> handler, TSender sender, TArgs args)
-            where TArgs : EventArgs;
+        void Invoke<TSender, TArgs>(EventHandler<TSender, TArgs> handler, TSender sender, TArgs args);
     }
 }
