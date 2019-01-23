@@ -23,8 +23,8 @@ namespace Hamster
                 return new ProgramConfig() {
                     Assemblies = new FilePatternConfig[] { new FilePatternConfig() { Path = "lib/hamster/plugins", Pattern="*.dll", Recursive=true } },
                     Plugins = new FilePatternConfig[] {
-                        new FilePatternConfig() { Path = "/etc/hamster", Pattern="*.xml", Recursive=true },
-                        new FilePatternConfig() { Path = "etc/hamster", Pattern="*.xml", Recursive=true },
+                        new FilePatternConfig() { Path = "/etc/hamster/plugins", Pattern="*.xml", Recursive=true },
+                        new FilePatternConfig() { Path = "etc/hamster/plugins", Pattern="*.xml", Recursive=true },
                     },
                 };
             } else {
