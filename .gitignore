@@ -39,7 +39,7 @@ test-results/
 # User-specific files (MonoDevelop/Xamarin Studio)
 
 # Build results
-[Dd]ebug/
+build/*[Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
