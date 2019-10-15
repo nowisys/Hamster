@@ -18,4 +18,4 @@ By default openHAMSTER is looking for assemblies and settings in following direc
 
 These directories can be customized within the ProgramConfig_ as well.
 
-.. _ProgramConfig: https://gitlab.hrz.tu-chemnitz.de/openhamster/Hamster/blob/master/src/Hamster/Configuration/ProgramConfig.cs
+.. _ProgramConfig: https://github.com/nowisys/Hamster/blob/master/src/Hamster/Configuration/ProgramConfig.cs
