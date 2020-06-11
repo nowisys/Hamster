@@ -1,7 +1,0 @@
-<Project>
-  <PropertyGroup>
-    <BaseOutputPath>$(MSBuildThisFileDirectory)/build/$(MSBuildProjectName)</BaseOutputPath>
-    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)/obj/$(MSBuildProjectName)</BaseIntermediateOutputPath>
-    <PublishDir>$(MSBuildThisFileDirectory)/dist/$(MSBuildProjectName)</PublishDir>
-  </PropertyGroup>
-</Project>

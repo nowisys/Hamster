@@ -1,6 +1,4 @@
-using System.Xml;
 using System.Xml.Serialization;
-using Hamster.Plugin;
 
 namespace Hamster.Configuration
 {
