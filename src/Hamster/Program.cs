@@ -17,6 +17,7 @@ namespace Hamster
     {
         private static ILogger logger;
         private static QueuingEventTrigger eventQueue;
+        private static IPluginDirectory plugins;
 
         public static ProgramConfig LoadConfig(string path)
         {
@@ -148,21 +149,18 @@ namespace Hamster
             return plugins;
         }
 
-        public static Dictionary<string, IPlugin> CreatePlugins(IEnumerable<PluginConfig> config)
+        public static void CreatePlugins(IEnumerable<PluginConfig> config)
         {
-            var plugins = new Dictionary<string, IPlugin>();
             foreach (var pluginConfig in config)
             {
                 var services = GetServices(pluginConfig.Name);
                 var factory = (IObjectFactory) services.GetService(typeof(IObjectFactory));
                 var type = Type.GetType(pluginConfig.Type);
-                var plugin = (IPlugin) factory.Create(type, new Dictionary<string, object>());
+                var plugin = (IPlugin) factory.Create(type, new Dictionary<string, object>{{"Plugins", plugins}});
                 plugin.Name = pluginConfig.Name;
 
-                plugins[plugin.Name] = plugin;
+                plugins.Register(plugin.Name, plugin);
             }
-
-            return plugins;
         }
 
         public static IList<PluginConfig> SortPluginConfigs(IList<PluginConfig> config)
@@ -208,16 +206,16 @@ namespace Hamster
             return sortedConfig;
         }
 
-        public static void ConfigurePlugins(IDictionary<string, IPlugin> plugins, IEnumerable<PluginConfig> config)
+        public static void ConfigurePlugins(IEnumerable<PluginConfig> config)
         {
             foreach (var pluginConfig in config)
             {
-                var plugin = plugins[pluginConfig.Name];
+                var plugin = plugins.GetPlugins().FirstOrDefault(x => x.Name == pluginConfig.Name);
 
                 if (pluginConfig.Settings != null)
                 {
                     var configurable = (IXmlConfigurable) plugin;
-                    configurable.Configure(pluginConfig.Settings);
+                    configurable?.Configure(pluginConfig.Settings);
                 }
 
                 if (pluginConfig.Bindings != null)
@@ -227,14 +225,14 @@ namespace Hamster
                     {
                         foreach (var binding in pluginConfig.Bindings)
                         {
-                            bindable.Bind(binding.Slot, plugins[binding.Plugin]);
+                            bindable.Bind(binding.Slot, plugins.GetPlugins().FirstOrDefault(x => x.Name ==binding.Plugin));
                         }
 
                         bindable.BindingComplete();
                     }
                 }
 
-                plugin.Init();
+                plugin?.Init();
             }
         }
 
@@ -263,6 +261,7 @@ namespace Hamster
 
             logger = new DebugLogger("Hamster");
             eventQueue = new QueuingEventTrigger();
+            plugins = new PluginDirectory();
 
             if (args.Length > 1)
             {
@@ -299,10 +298,10 @@ namespace Hamster
                 }
 
                 var pluginConfigs = LoadAllPlugins(config.Plugins);
-                var plugins = CreatePlugins(pluginConfigs);
-                ConfigurePlugins(plugins, pluginConfigs);
+                CreatePlugins(pluginConfigs);
+                ConfigurePlugins(pluginConfigs);
 
-                foreach (var plugin in plugins.Values)
+                foreach (var plugin in plugins.GetPlugins())
                 {
                     plugin.Open();
                 }

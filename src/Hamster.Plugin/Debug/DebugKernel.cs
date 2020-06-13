@@ -8,10 +8,11 @@ namespace Hamster.Plugin.Debug
     public class DebugKernel : IDisposable, IServiceProvider
     {
         private ILogger logger;
-        private IObjectFactory factory;
-        private IPluginManager manager;
+        private readonly IObjectFactory factory;
+        private readonly IPluginManager manager;
+        private readonly IPluginDirectory plugins;
 
-        private Dictionary<string, IPlugin> plugins;
+        //private Dictionary<string, IPlugin> plugins;
 
         public DebugKernel()
             : this("settings")
@@ -28,7 +29,7 @@ namespace Hamster.Plugin.Debug
             this.manager = manager;
             logger = new DebugLogger("Debug");
             factory = new ObjectFactory(this);
-            plugins = new Dictionary<string, IPlugin>(StringComparer.CurrentCultureIgnoreCase);
+            plugins = new DebugPluginDirectory();
         }
 
         public ILogger Logger
@@ -54,30 +55,28 @@ namespace Hamster.Plugin.Debug
 
         public virtual void Configure(IPlugin plugin, XmlElement settings)
         {
-            IXmlConfigurable target = plugin as IXmlConfigurable;
-            if (target != null && !target.IsConfigured)
+            if (plugin is IXmlConfigurable config && !config.IsConfigured)
             {
-                target.Configure(settings);
+                config.Configure(settings);
             }
         }
 
         public virtual void Bind(IPlugin plugin, IEnumerable<PluginBind> bindings)
         {
-            IBindable target = plugin as IBindable;
-            if (target != null)
+            if (plugin is IBindable bindablePlugin)
             {
                 foreach (var bind in bindings)
                 {
                     try
                     {
-                        target.Bind(bind.Slot, GetPlugin(bind.Plugin));
+                        bindablePlugin.Bind(bind.Slot, GetPlugin(bind.Plugin));
                     }
                     catch (Exception x)
                     {
                         throw new BindingException(string.Format("Could not resolve binding to '{0}'.", bind.Plugin), x);
                     }
                 }
-                target.BindingComplete();
+                bindablePlugin.BindingComplete();
             }
         }
 
@@ -95,17 +94,12 @@ namespace Hamster.Plugin.Debug
             Bind(plugin, config.Bindings);
             plugin.Init();
 
-            plugins.Add(plugin.Name, plugin);
+            plugins.Register(plugin.Name, plugin);
         }
 
         public virtual IPlugin GetPlugin(string name)
         {
-            IPlugin result;
-            if (!plugins.TryGetValue(name, out result))
-            {
-                result = LoadPlugin(name);
-            }
-            return result;
+            return plugins.GetPlugin(name);
         }
 
         /// <summary>
@@ -118,7 +112,7 @@ namespace Hamster.Plugin.Debug
             var config = manager.GetPlugin(name);
 
             Type type = Type.GetType(config.Type);
-            IPlugin result = (IPlugin)factory.Create(type, null);
+            IPlugin result = (IPlugin)factory.Create(type, new Dictionary<string, object> {{"Plugins" , plugins}});
             SetupPlugin(result, config);
             return result;
         }
@@ -135,19 +129,32 @@ namespace Hamster.Plugin.Debug
         }
 
         /// <summary>
+        /// Öffnet das Plugin
+        /// </summary>
+        /// <param name="name">Name des Plugins<</param>
+        public virtual void OpenPlugin(string name)
+        {
+            var plugin = plugins.GetPlugin(name);
+            if (plugin != null && !plugin.IsOpen)
+            {
+                plugin.Open();
+            }
+        }
+
+        /// <summary>
         /// Beendet alle Plugins
         /// </summary>
         public virtual void Dispose()
         {
-            foreach (var pair in plugins)
+            foreach (var plugin in plugins.GetPlugins())
             {
                 try
                 {
-                    pair.Value.Close();
+                    plugin.Close();
                 }
                 catch (Exception x)
                 {
-                    Logger.Error(x, "Error closing plugin '{0}'.", pair.Key);
+                    Logger.Error(x, "Error closing plugin '{0}'.", plugin.Name);
                 }
             }
         }
