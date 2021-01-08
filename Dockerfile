@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:sdk AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 WORKDIR /app
 
 COPY Hamster.sln ./
@@ -7,8 +7,8 @@ COPY src/Hamster.Plugin/Hamster.Plugin.csproj ./src/Hamster.Plugin/
 RUN dotnet restore
 
 COPY . ./
-RUN dotnet publish -c Release
+RUN dotnet publish -c Release -o dist
 
-FROM microsoft/dotnet:aspnetcore-runtime
-COPY --from=build-env /app/dist/Hamster /usr/lib/hamster
+FROM mcr.microsoft.com/dotnet/runtime:5.0
+COPY --from=build-env /app/dist /usr/lib/hamster
 ENTRYPOINT ["dotnet", "/usr/lib/hamster/Hamster.dll"]
