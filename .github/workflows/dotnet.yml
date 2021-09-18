@@ -8,7 +8,7 @@ on:
 
 env:
   NUGET_REG: https://nuget.pkg.github.com/nowisys/index.json
-  NUGET_KEY: ${{ secrets.GITHUB_TOKEN }}
+  NUGET_KEY: ${{ secrets.NUGET_TOKEN }}
 
 jobs:
   build:
