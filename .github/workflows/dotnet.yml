@@ -28,4 +28,4 @@ jobs:
     - name: Pack
       run: dotnet pack --no-restore
     - name: Push
-      run: dotnet nuget pack src/Hamster.Plugin/bin/Debug/Hamster.Plugin.*.nupkg --skip-dupicate -k ${{ env.NUGET_KEY }} -s ${{ env.NUGET_REG }}
+      run: dotnet nuget push src/Hamster.Plugin/bin/Debug/Hamster.Plugin.*.nupkg --skip-dupicate -k ${{ env.NUGET_KEY }} -s ${{ env.NUGET_REG }}
