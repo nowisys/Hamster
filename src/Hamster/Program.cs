@@ -125,7 +125,10 @@ namespace Hamster
                 {
                     using (var file = File.Open(fullPath, FileMode.Open))
                     {
-                        plugins.Add((PluginConfig) serializer.Deserialize(file));
+                        var pluginConfig = (PluginConfig) serializer.Deserialize(file);
+                        if(pluginConfig != null && !pluginConfig.Disabled) {
+                            plugins.Add(pluginConfig);
+                        }
                     }
 
                     logger.Info($"Loaded plugin config: {fullPath}");
@@ -185,7 +188,7 @@ namespace Hamster
                     {
                         if (config.FirstOrDefault(x => x.Name == pluginBinding.Plugin) == null)
                         {
-                            logger.Warn($"Binding mismatch in  plugin {pluginConfig.Name}. Unabled to find binding {pluginBinding.Plugin}!");
+                            logger.Warn($"Binding mismatch in plugin {pluginConfig.Name}. Unabled to find binding {pluginBinding.Plugin}!");
                         }
                         else
                         {
