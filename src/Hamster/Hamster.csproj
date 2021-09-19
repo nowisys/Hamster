@@ -4,6 +4,14 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageId>Hamster</PackageId>
+    <VersionSuffix>$(VersionSuffix)</VersionSuffix>
+    <Version>1.0.6</Version>
+    <Version Condition=" '$(VersionSuffix)' != '' ">$(Version)-$(VersionSuffix)</Version>
+    <Authors>Nowisys</Authors>
+    <Company>Nowisys</Company>
+    <PackageDescription>Hamster</PackageDescription>
+    <RepositoryUrl>https://github.com/nowisys/Hamster</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
