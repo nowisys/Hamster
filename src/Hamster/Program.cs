@@ -126,7 +126,8 @@ namespace Hamster
                     using (var file = File.Open(fullPath, FileMode.Open))
                     {
                         var pluginConfig = (PluginConfig) serializer.Deserialize(file);
-                        if(pluginConfig != null && !pluginConfig.Disabled) {
+                        if(pluginConfig != null && !pluginConfig.Disabled) 
+                        {
                             plugins.Add(pluginConfig);
                         }
                     }
