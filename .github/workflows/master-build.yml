@@ -1,4 +1,4 @@
-name: .NET
+name: Master Build
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore --version-suffix -alpha${{ env.GITHUB_RUN_NUMBER }}
     - name: Pack
       run: dotnet pack --no-restore
     - name: Push
