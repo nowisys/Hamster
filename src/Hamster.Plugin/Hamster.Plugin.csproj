@@ -5,7 +5,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageId>Hamster.Plugin</PackageId>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
-    <Version>1.0.6</Version>
+    <Version>1.0.1</Version>
     <Version Condition=" '$(VersionSuffix)' != '' ">$(Version)-$(VersionSuffix)</Version>
     <Authors>Nowisys</Authors>
     <Company>Nowisys</Company>
