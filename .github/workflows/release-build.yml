@@ -3,9 +3,7 @@ name: Release Build
 on:
   release:
     types:
-      - created
       - published
-      - edited
 
 env:
   NUGET_REG: https://nuget.pkg.github.com/nowisys/index.json
